@@ -1,0 +1,11 @@
+[package]
+name = "infinite-sokoban"
+version = "0.0.0-development"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+gdnative = "0.11.3"
+sokoban-level-generator = { git = "https://github.com/smartive/rust-sokoban-level-generator.git", version = "0.0.0-development" }
