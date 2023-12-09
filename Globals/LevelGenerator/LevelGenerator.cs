@@ -1,10 +1,17 @@
 namespace InfiniteSokoban.Globals.LevelGenerator;
 
-public class LevelGenerator(Node native)
+public class LevelGenerator : Node
 {
-    public GeneratedLevel GenerateLevel(int width, int height, int boxCount)
+    private Node _native = null!;
+
+    public override void _Ready()
     {
-        var encoded = native.Call("generate_level", width, height, boxCount) as string;
-        return GeneratedLevel.Parse(encoded ?? throw new("Level Null"));
+        _native = GetNode("Native");
+    }
+
+    public GeneratedLevel GenerateLevel(int height, int width, int boxCount)
+    {
+        var encoded = _native.Call("generate_level", height, width, boxCount) as string;
+        return GeneratedLevel.Parse(encoded ?? throw new("Level Null"), width, height);
     }
 }

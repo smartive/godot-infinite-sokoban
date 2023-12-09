@@ -1,44 +1,46 @@
 using System.Text;
 
+using InfiniteSokoban.Data;
+
 namespace InfiniteSokoban.Globals.LevelGenerator;
 
-public class GeneratedLevel
+public class GeneratedLevel : CoordinateArray<Cell>
 {
-    public Cell[,] Cells { get; private set; } = new Cell[0, 0];
-
-    public int Width => Cells.GetLength(1);
-
-    public int Height => Cells.GetLength(0);
-
-    private GeneratedLevel()
+    private GeneratedLevel(int width, int height) : base(width, height)
     {
     }
 
-    public static GeneratedLevel Parse(string encodedLevel)
+    public static GeneratedLevel Parse(string encodedLevel, int xRooms, int yRooms)
     {
         var lines = encodedLevel.Split('|');
-        var height = lines.Length;
-        var width = int.Parse(lines[0][0].ToString());
+        var height = yRooms * 3 + 2;
+        var width = xRooms * 3 + 2;
 
-        var level = new GeneratedLevel
-        {
-            Cells = new Cell[height, width],
-        };
+        var level = new GeneratedLevel(width, height);
 
         foreach (var (row, y) in lines.Select((row, y) => (row, y)))
         {
+            var num = string.Empty;
             var x = 0;
-            for (var i = 0; i < row.Length; i += 2)
+            foreach (var c in row)
             {
-                var count = int.Parse(row[i].ToString());
-                var cell = CellExtensions.FromChar(row[i + 1]);
-
-                for (var j = x; j < x + count; j++)
+                if (char.IsDigit(c))
                 {
-                    level.Cells[y, j] = cell;
+                    num += c;
                 }
+                else
+                {
+                    var count = int.Parse(num);
+                    num = string.Empty;
+                    var cell = CellExtensions.FromChar(c);
 
-                x += count;
+                    for (var j = x; j < x + count; j++)
+                    {
+                        level[j, y] = cell;
+                    }
+
+                    x += count;
+                }
             }
         }
 
@@ -51,7 +53,7 @@ public class GeneratedLevel
 
         for (var y = 0; y < Height; y++)
         {
-            for (var x = 0; x < Width; x++) sb.Append(Cells[y, x].ToChar());
+            for (var x = 0; x < Width; x++) sb.Append(this[y, x].ToChar());
 
             sb.Append('\n');
         }
