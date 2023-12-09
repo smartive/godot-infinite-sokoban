@@ -1,4 +1,3 @@
-using InfiniteSokoban.Entities.Tile;
 using InfiniteSokoban.Globals;
 using InfiniteSokoban.Globals.LevelGenerator;
 
@@ -61,7 +60,7 @@ public class Level : Node2D
                     break;
                 case Cell.Box:
                     {
-                        var box = Objects[Cell.Box].Instance<Box>();
+                        var box = Objects[Cell.Box].Instance<Node2D>();
                         box.Position = cellPosition;
                         _boxes.AddChild(box);
                     }
@@ -73,7 +72,7 @@ public class Level : Node2D
                     break;
                 case Cell.BoxOnGoal:
                     {
-                        var box = Objects[Cell.Box].Instance<Box>();
+                        var box = Objects[Cell.Box].Instance<Node2D>();
                         box.Position = cellPosition;
                         _boxes.AddChild(box);
 
