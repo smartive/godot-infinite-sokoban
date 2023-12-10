@@ -7,8 +7,10 @@ reloadable=true
 
 [entry]
 
-OSX.64="res://native/target/release/libinfinite_sokoban.dylib"
+OSX.64="res://native/target/aarch64-apple-darwin/release/libinfinite_sokoban.dylib"
+Windows.64="res://native/target/x86_64-pc-windows-msvc/release/infinite_sokoban.dll"
 
 [dependencies]
 
 OSX.64=[  ]
+Windows.64=[  ]
