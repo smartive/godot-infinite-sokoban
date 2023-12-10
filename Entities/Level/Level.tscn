@@ -27,3 +27,8 @@ z_index = 50
 [node name="Player" parent="." instance=ExtResource( 2 )]
 unique_name_in_owner = true
 z_index = 50
+
+[node name="ObjectMover" type="Tween" parent="."]
+unique_name_in_owner = true
+
+[connection signal="tween_completed" from="ObjectMover" to="." method="OnObjectMoved"]

@@ -1,5 +1,8 @@
+using InfiniteSokoban.Extensions;
 using InfiniteSokoban.Globals;
 using InfiniteSokoban.Globals.LevelGenerator;
+
+using Object = Godot.Object;
 
 namespace InfiniteSokoban.Entities.Level;
 
@@ -9,7 +12,9 @@ public class Level : Node2D
     private Node _walls = null!;
     private Node _goals = null!;
     private Node _boxes = null!;
-    private Player _player = null!;
+    private Player.Player _player = null!;
+    private Tween _objectMover = null!;
+
     private LevelGenerator _levelGenerator = null!;
     private GeneratedLevel? _currentLevel;
 
@@ -38,56 +43,54 @@ public class Level : Node2D
 
         foreach (var (x, y, cell) in LoadedLevel.IndexedIterator())
         {
-            var cellPosition = new Vector2(x * 64, y * 64);
-
-            var floor = Objects[Cell.Floor].Instance<Node2D>();
-            floor.Position = cellPosition;
+            var floor = Objects[Cell.Floor].Instance<LevelEntity>();
+            floor.GridPosition = (x, y);
             _floor.AddChild(floor);
 
             switch (cell)
             {
                 case Cell.Wall:
-                    var wall = Objects[Cell.Wall].Instance<Node2D>();
-                    wall.Position = cellPosition;
+                    var wall = Objects[Cell.Wall].Instance<LevelEntity>();
+                    wall.GridPosition = (x, y);
                     _walls.AddChild(wall);
                     break;
                 case Cell.Goal:
                     {
-                        var goal = Objects[Cell.Goal].Instance<Node2D>();
-                        goal.Position = cellPosition;
+                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
+                        goal.GridPosition = (x, y);
                         _goals.AddChild(goal);
                     }
                     break;
                 case Cell.Box:
                     {
-                        var box = Objects[Cell.Box].Instance<Node2D>();
-                        box.Position = cellPosition;
+                        var box = Objects[Cell.Box].Instance<LevelEntity>();
+                        box.GridPosition = (x, y);
                         _boxes.AddChild(box);
                     }
                     break;
                 case Cell.Player:
                     {
-                        _player.Position = cellPosition;
+                        _player.GridPosition = (x, y);
                     }
                     break;
                 case Cell.BoxOnGoal:
                     {
-                        var box = Objects[Cell.Box].Instance<Node2D>();
-                        box.Position = cellPosition;
+                        var box = Objects[Cell.Box].Instance<LevelEntity>();
+                        box.GridPosition = (x, y);
                         _boxes.AddChild(box);
 
-                        var goal = Objects[Cell.Goal].Instance<Node2D>();
-                        goal.Position = cellPosition;
+                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
+                        goal.GridPosition = (x, y);
                         _goals.AddChild(goal);
                     }
                     break;
 
                 case Cell.PlayerOnGoal:
                     {
-                        var goal = Objects[Cell.Goal].Instance<Node2D>();
-                        goal.Position = cellPosition;
+                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
+                        goal.GridPosition = (x, y);
                         _goals.AddChild(goal);
-                        _player.Position = cellPosition;
+                        _player.GridPosition = (x, y);
                     }
                     break;
             }
@@ -101,10 +104,95 @@ public class Level : Node2D
 
     public override void _Ready()
     {
-        _floor = GetNode<Node>("Floor");
-        _walls = GetNode<Node>("Walls");
-        _goals = GetNode<Node>("Goals");
-        _boxes = GetNode<Node>("Boxes");
-        _player = GetNode<Player>("Player");
+        _floor = GetNode<Node>("%Floor");
+        _walls = GetNode<Node>("%Walls");
+        _goals = GetNode<Node>("%Goals");
+        _boxes = GetNode<Node>("%Boxes");
+        _player = GetNode<Player.Player>("%Player");
+        _objectMover = GetNode<Tween>("%ObjectMover");
     }
+
+    public override void _Input(InputEvent @event)
+    {
+        const float moveDuration = .4f;
+
+        if (_objectMover.IsActive() || @event.PlayerMoveDirection() is not { } direction)
+        {
+            // Don't allow input while the player / boxes are moving.
+            return;
+        }
+
+        var (x, y) = _player.GridPosition;
+        
+        if (direction.Move((x,y), LoadedLevel.Width, LoadedLevel.Height) is not { } aa)
+        {
+            // Don't allow the player to move outside the level.
+            return;
+        }
+        
+        var (nexX, newY) = aa;
+
+        switch (true)
+        {
+            case true when @event.IsActionPressed(GameInputMap.PlayerUp):
+                {
+                    _player.Move(Direction.Up);
+                    _objectMover.InterpolateProperty(
+                        _player,
+                        "position",
+                        _player.Position,
+                        CoordsToPos((x, y - 1)),
+                        moveDuration);
+                }
+                break;
+            case true when @event.IsActionPressed(GameInputMap.PlayerDown):
+                {
+                    _player.Move(Direction.Down);
+                    _objectMover.InterpolateProperty(
+                        _player,
+                        "position",
+                        _player.Position,
+                        CoordsToPos((x, y + 1)),
+                        moveDuration);
+                }
+                break;
+            case true when @event.IsActionPressed(GameInputMap.PlayerLeft):
+                {
+                    _player.Move(Direction.Left);
+                    _objectMover.InterpolateProperty(
+                        _player,
+                        "position",
+                        _player.Position,
+                        CoordsToPos((x - 1, y)),
+                        moveDuration);
+                }
+                break;
+            case true when @event.IsActionPressed(GameInputMap.PlayerRight):
+                {
+                    _player.Move(Direction.Right);
+                    _objectMover.InterpolateProperty(
+                        _player,
+                        "position",
+                        _player.Position,
+                        CoordsToPos((x + 1, y)),
+                        moveDuration);
+                }
+                break;
+        }
+
+        _objectMover.Start();
+    }
+    
+    private void MoveObjects(){}
+
+    private void OnObjectMoved(Object obj, NodePath _)
+    {
+        if (obj is Player.Player p)
+        {
+            p.Stop();
+        }
+    }
+
+    private static Vector2 CoordsToPos((int X, int Y) gridPosition) =>
+        new(gridPosition.X * 64, gridPosition.Y * 64);
 }

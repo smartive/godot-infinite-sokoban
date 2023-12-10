@@ -11,6 +11,14 @@ public enum Cell {
 }
 
 public static class CellExtensions {
+    public static bool BlocksPlayer(this Cell cell) =>
+        cell switch {
+            Cell.Wall => true,
+            Cell.Box => true,
+            Cell.BoxOnGoal => true,
+            _ => false,
+        };
+    
     public static char ToChar(this Cell cell) =>
         cell switch {
             Cell.Wall => '#',
