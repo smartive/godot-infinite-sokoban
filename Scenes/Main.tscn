@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Ui/Menu.theme" type="Theme" id=1]
 [ext_resource path="res://Scenes/Main.cs" type="Script" id=2]
+[ext_resource path="res://Ui/Button/Button.tscn" type="PackedScene" id=3]
 
 [node name="Main" type="Control"]
 anchor_right = 1.0
@@ -28,7 +29,7 @@ anchor_bottom = 0.7
 margin_right = 40.0
 margin_bottom = 40.0
 
-[node name="Button" type="Button" parent="Panel"]
+[node name="UiButton" parent="Panel" instance=ExtResource( 3 )]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -37,6 +38,10 @@ margin_left = -74.0
 margin_top = -19.0
 margin_right = 74.0
 margin_bottom = 19.0
+theme = null
 text = "Start Game"
+__meta__ = {
+"_editor_description_": ""
+}
 
-[connection signal="pressed" from="Panel/Button" to="." method="StartGamePressed"]
+[connection signal="pressed" from="Panel/UiButton" to="." method="StartGamePressed"]
