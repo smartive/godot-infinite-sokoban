@@ -1,8 +1,7 @@
 build-native-dev:
     just _build-{{os()}}
 
-# build-native: _build-wasm
-
+build-native-prod: _build-wasm
 
 _install-target target:
     @echo "Check if target {{target}} is installed."
