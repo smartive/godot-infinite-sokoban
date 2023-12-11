@@ -26,11 +26,15 @@ public static class DirectionExtensions
         return (coords.X + x, coords.Y + y);
     }
     
-    public static (int X, int Y)? Move(this Direction direction, (int X, int Y) coords, int Width, int Height)
+    /// <summary>
+    /// Move the coordinates into the given direction. However, if the new coordinates are outside the given bounds,
+    /// null is returned. To calculate the boundaries, 0 based indices are used.
+    /// </summary>
+    public static (int X, int Y)? Move(this Direction direction, (int X, int Y) coords, int width, int height)
     {
         var (x, y) = direction.ToCoords();
         var (newX, newY) = (coords.X + x, coords.Y + y);
-        if (newX < 0 || newX >= Width - 1 || newY < 0 || newY >= Height - 1)
+        if (newX < 0 || newX >= width - 1 || newY < 0 || newY >= height - 1)
         {
             return null;
         }

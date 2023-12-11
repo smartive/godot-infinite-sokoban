@@ -1,3 +1,4 @@
+using InfiniteSokoban.Data;
 using InfiniteSokoban.Extensions;
 using InfiniteSokoban.Globals;
 using InfiniteSokoban.Globals.LevelGenerator;
@@ -16,7 +17,8 @@ public class Level : Node2D
     private Tween _objectMover = null!;
 
     private LevelGenerator _levelGenerator = null!;
-    private GeneratedLevel? _currentLevel;
+    private GeneratedLevel? _generatedLevel;
+    private CoordinateArray<Cell?>? _blockingEntities;
 
     private static readonly Dictionary<Cell, PackedScene> Objects = new()
     {
@@ -35,13 +37,15 @@ public class Level : Node2D
     [Export(PropertyHint.Range, "1,3,1")]
     public int BoxCount { get; set; } = 2;
 
-    private GeneratedLevel LoadedLevel => _currentLevel ?? throw new("Level not loaded.");
+    private CoordinateArray<Cell?> BlockingEntities => _blockingEntities ?? new CoordinateArray<Cell?>(Width, Height);
+    private GeneratedLevel LoadedLevel => _generatedLevel ?? throw new("Level is null.");
 
     public void Generate()
     {
-        _currentLevel = _levelGenerator.GenerateLevel(Height, Width, BoxCount);
+        _generatedLevel = _levelGenerator.GenerateLevel(Height, Width, BoxCount);
+        _blockingEntities = new CoordinateArray<Cell?>(_generatedLevel.Width, _generatedLevel.Height);
 
-        foreach (var (x, y, cell) in LoadedLevel.IndexedIterator())
+        foreach (var (x, y, cell) in _generatedLevel.IndexedIterator())
         {
             var floor = Objects[Cell.Floor].Instance<LevelEntity>();
             floor.GridPosition = (x, y);
@@ -50,9 +54,12 @@ public class Level : Node2D
             switch (cell)
             {
                 case Cell.Wall:
-                    var wall = Objects[Cell.Wall].Instance<LevelEntity>();
-                    wall.GridPosition = (x, y);
-                    _walls.AddChild(wall);
+                    {
+                        var wall = Objects[Cell.Wall].Instance<LevelEntity>();
+                        wall.GridPosition = (x, y);
+                        _walls.AddChild(wall);
+                        _blockingEntities[x, y] = Cell.Wall;
+                    }
                     break;
                 case Cell.Goal:
                     {
@@ -66,6 +73,7 @@ public class Level : Node2D
                         var box = Objects[Cell.Box].Instance<LevelEntity>();
                         box.GridPosition = (x, y);
                         _boxes.AddChild(box);
+                        _blockingEntities[x, y] = Cell.Box;
                     }
                     break;
                 case Cell.Player:
@@ -78,6 +86,7 @@ public class Level : Node2D
                         var box = Objects[Cell.Box].Instance<LevelEntity>();
                         box.GridPosition = (x, y);
                         _boxes.AddChild(box);
+                        _blockingEntities[x, y] = Cell.Box;
 
                         var goal = Objects[Cell.Goal].Instance<LevelEntity>();
                         goal.GridPosition = (x, y);
@@ -116,74 +125,62 @@ public class Level : Node2D
     {
         const float moveDuration = .4f;
 
-        if (_objectMover.IsActive() || @event.PlayerMoveDirection() is not { } direction)
+        if (_objectMover.IsActive() || @event.InputPlayerDirection(true) is not { } direction)
         {
             // Don't allow input while the player / boxes are moving.
             return;
         }
 
         var (x, y) = _player.GridPosition;
-        
-        if (direction.Move((x,y), LoadedLevel.Width, LoadedLevel.Height) is not { } aa)
+
+        if (direction.Move((x, y), LoadedLevel.Width, LoadedLevel.Height) is not { } newPos)
         {
             // Don't allow the player to move outside the level.
+            _player.Look(direction);
             return;
         }
-        
-        var (nexX, newY) = aa;
 
-        switch (true)
+        if (BlockingEntities[newPos] == Cell.Wall)
         {
-            case true when @event.IsActionPressed(GameInputMap.PlayerUp):
-                {
-                    _player.Move(Direction.Up);
-                    _objectMover.InterpolateProperty(
-                        _player,
-                        "position",
-                        _player.Position,
-                        CoordsToPos((x, y - 1)),
-                        moveDuration);
-                }
-                break;
-            case true when @event.IsActionPressed(GameInputMap.PlayerDown):
-                {
-                    _player.Move(Direction.Down);
-                    _objectMover.InterpolateProperty(
-                        _player,
-                        "position",
-                        _player.Position,
-                        CoordsToPos((x, y + 1)),
-                        moveDuration);
-                }
-                break;
-            case true when @event.IsActionPressed(GameInputMap.PlayerLeft):
-                {
-                    _player.Move(Direction.Left);
-                    _objectMover.InterpolateProperty(
-                        _player,
-                        "position",
-                        _player.Position,
-                        CoordsToPos((x - 1, y)),
-                        moveDuration);
-                }
-                break;
-            case true when @event.IsActionPressed(GameInputMap.PlayerRight):
-                {
-                    _player.Move(Direction.Right);
-                    _objectMover.InterpolateProperty(
-                        _player,
-                        "position",
-                        _player.Position,
-                        CoordsToPos((x + 1, y)),
-                        moveDuration);
-                }
-                break;
+            // The player cannot move through walls.
+            _player.Look(direction);
+            return;
+        }
+
+        if (BlockingEntities[newPos]?.CouldBlockPlayer() == true &&
+            direction.Move(newPos, LoadedLevel.Width, LoadedLevel.Height) is { } overNextPos &&
+            BlockingEntities[overNextPos]?.CouldBlockPlayer() == true)
+        {
+            // The player cannot push boxes into walls or other boxes.
+            _player.Look(direction);
+            return;
+        }
+
+        // Move the player
+        _player.Move(direction);
+        _objectMover.InterpolateProperty(
+            _player,
+            "position",
+            _player.Position,
+            CoordsToPos(newPos),
+            moveDuration);
+
+        // Move the box if there is one.
+        if (BlockingEntities[newPos] == Cell.Box)
+        {
+            var box = _boxes.GetChildren().OfType<LevelEntity>().First(l => l.GridPosition == newPos);
+            var newBoxPos = direction.Move(box.GridPosition);
+            BlockingEntities.Swap(box.GridPosition, newBoxPos);
+            _objectMover.InterpolateProperty(
+                box,
+                "position",
+                box.Position,
+                CoordsToPos(newBoxPos),
+                moveDuration);
         }
 
         _objectMover.Start();
     }
-    
-    private void MoveObjects(){}
 
     private void OnObjectMoved(Object obj, NodePath _)
     {

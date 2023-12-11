@@ -1,6 +1,7 @@
 namespace InfiniteSokoban.Globals.LevelGenerator;
 
-public enum Cell {
+public enum Cell
+{
     Wall,
     Player,
     PlayerOnGoal,
@@ -10,17 +11,18 @@ public enum Cell {
     Floor,
 }
 
-public static class CellExtensions {
-    public static bool BlocksPlayer(this Cell cell) =>
-        cell switch {
-            Cell.Wall => true,
-            Cell.Box => true,
-            Cell.BoxOnGoal => true,
+public static class CellExtensions
+{
+    public static bool CouldBlockPlayer(this Cell cell) =>
+        cell switch
+        {
+            Cell.Wall or Cell.Box or Cell.BoxOnGoal => true,
             _ => false,
         };
-    
+
     public static char ToChar(this Cell cell) =>
-        cell switch {
+        cell switch
+        {
             Cell.Wall => '#',
             Cell.Player => '@',
             Cell.PlayerOnGoal => '+',
@@ -32,7 +34,8 @@ public static class CellExtensions {
         };
 
     public static Cell FromChar(char c) =>
-        c switch {
+        c switch
+        {
             '#' => Cell.Wall,
             '@' => Cell.Player,
             '+' => Cell.PlayerOnGoal,

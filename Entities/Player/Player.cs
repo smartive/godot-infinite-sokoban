@@ -21,6 +21,12 @@ public class Player : LevelEntity
 
     private const string MoveDown = "move_down";
 
+    public void Look(Direction direction)
+    {
+        _direction = direction;
+        Stop();
+    }
+    
     public void Move(Direction direction)
     {
         _direction = direction;

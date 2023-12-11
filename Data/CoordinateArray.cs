@@ -3,6 +3,8 @@ using System.Text;
 
 namespace InfiniteSokoban.Data;
 
+using Coordinates = (int X, int Y);
+
 public class CoordinateArray<T> : IEnumerable<T>
 {
     public CoordinateArray(int width, int height)
@@ -31,7 +33,7 @@ public class CoordinateArray<T> : IEnumerable<T>
         set => Data[x + (y * Width)] = value;
     }
 
-    public T this[(int X, int Y) index]
+    public T this[Coordinates index]
     {
         get => this[index.X, index.Y];
         set => this[index.X, index.Y] = value;
@@ -47,7 +49,7 @@ public class CoordinateArray<T> : IEnumerable<T>
         }
     }
 
-    public IEnumerable<(int X, int Y)> IndexIterator()
+    public IEnumerable<Coordinates> IndexIterator()
     {
         for (var i = 0; i < Data.Length; i++)
         {
@@ -57,7 +59,7 @@ public class CoordinateArray<T> : IEnumerable<T>
         }
     }
 
-    public CoordinateArray<T> GetWindow((int X, int Y) from, (int X, int Y) to)
+    public CoordinateArray<T> GetWindow(Coordinates from, Coordinates to)
     {
         var window = new CoordinateArray<T>(to.X - from.X + 1, to.Y - from.Y + 1);
         for (var x = from.X; x <= to.X; x++)
@@ -109,7 +111,7 @@ public class CoordinateArray<T> : IEnumerable<T>
         }
     }
 
-    public void Swap((int X, int Y) a, (int X, int Y) b) =>
+    public void Swap(Coordinates a, Coordinates b) =>
         (this[a], this[b]) = (this[b], this[a]);
 
     public CoordinateArray<T> Clone() => new(Width, Height, (T[])Data.Clone());
