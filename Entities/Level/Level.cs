@@ -148,8 +148,9 @@ public class Level : Node2D
         }
 
         if (BlockingEntities[newPos]?.CouldBlockPlayer() == true &&
-            direction.Move(newPos, LoadedLevel.Width, LoadedLevel.Height) is { } overNextPos &&
-            BlockingEntities[overNextPos]?.CouldBlockPlayer() == true)
+            (direction.Move(newPos, LoadedLevel.Width, LoadedLevel.Height) is null ||
+             (direction.Move(newPos, LoadedLevel.Width, LoadedLevel.Height) is { } overNextPos &&
+              BlockingEntities[overNextPos]?.CouldBlockPlayer() == true)))
         {
             // The player cannot push boxes into walls or other boxes.
             _player.Look(direction);
