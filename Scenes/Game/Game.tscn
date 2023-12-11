@@ -2,12 +2,70 @@
 
 [ext_resource path="res://Entities/Level/Level.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scenes/Game/Game.cs" type="Script" id=2]
-[ext_resource path="res://Ui/TouchControls/TouchControls.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Ui/Menu.theme" type="Theme" id=3]
+[ext_resource path="res://Ui/TouchControls/TouchControls.tscn" type="PackedScene" id=4]
 
-[node name="Game" type="Node"]
+[node name="Game" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 3 )
 script = ExtResource( 2 )
+
+[node name="Header" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 0.1
+
+[node name="Panel" type="Panel" parent="Header"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_type_variation = "BlueOutlinePanel"
+
+[node name="Title" type="Label" parent="Header/Panel"]
+anchor_top = 0.02
+anchor_right = 1.0
+anchor_bottom = 0.02
+theme_type_variation = "TitleLabelDark"
+text = "Infinite Sokoban"
+align = 1
+
+[node name="LevelInfo" type="HFlowContainer" parent="Header/Panel"]
+anchor_left = 0.05
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+
+[node name="Title" type="Label" parent="Header/Panel/LevelInfo"]
+margin_right = 70.0
+margin_bottom = 18.0
+text = "Level:"
+
+[node name="LevelInfoValue" type="Label" parent="Header/Panel/LevelInfo"]
+unique_name_in_owner = true
+margin_left = 74.0
+margin_right = 354.0
+margin_bottom = 18.0
+text = "Width: 3, Height: 2, Boxes: 2"
+
+[node name="GoalInfo" type="HFlowContainer" parent="Header/Panel"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.9
+anchor_bottom = 0.5
+
+[node name="Title" type="Label" parent="Header/Panel/GoalInfo"]
+margin_right = 165.0
+margin_bottom = 18.0
+text = "Current Level:"
+
+[node name="GoalInfoValue" type="Label" parent="Header/Panel/GoalInfo"]
+unique_name_in_owner = true
+margin_left = 169.0
+margin_right = 265.0
+margin_bottom = 18.0
+text = "1/2 Goals"
+
+[node name="TouchControls" parent="." instance=ExtResource( 4 )]
+visible = false
 
 [node name="Level" parent="." instance=ExtResource( 1 )]
 unique_name_in_owner = true
-
-[node name="TouchControls" parent="." instance=ExtResource( 3 )]

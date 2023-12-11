@@ -11,6 +11,6 @@ public class Game : Node
         _level = GetNode<Level>("Level");
         
         // TODO: generate level based on settings.
-        _level.Generate();
+        _level.Start();
     }
 }

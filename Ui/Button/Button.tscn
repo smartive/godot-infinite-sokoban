@@ -1,13 +1,35 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=11 format=2]
 
-[ext_resource path="res://Ui/Menu.theme" type="Theme" id=1]
+[ext_resource path="res://Ui/Fonts/Default.tres" type="DynamicFont" id=1]
 [ext_resource path="res://Assets/Audio/button_click.ogg" type="AudioStream" id=2]
 [ext_resource path="res://Ui/Button/UiButton.cs" type="Script" id=3]
+[ext_resource path="res://Ui/Panel/GrayPanel.tres" type="StyleBox" id=4]
+[ext_resource path="res://Ui/Fonts/Title.tres" type="DynamicFont" id=5]
+[ext_resource path="res://Ui/Button/GreenButtonPressed.tres" type="StyleBox" id=6]
+[ext_resource path="res://Ui/Panel/BlueOutlinePanel.tres" type="StyleBox" id=7]
+[ext_resource path="res://Ui/Button/GreenButtonHover.tres" type="StyleBox" id=8]
+[ext_resource path="res://Ui/Button/GreenButtonNormal.tres" type="StyleBox" id=9]
+
+[sub_resource type="Theme" id=1]
+BlueOutlinePanel/base_type = "Panel"
+BlueOutlinePanel/styles/panel = ExtResource( 7 )
+Button/colors/font_color = Color( 0, 0, 0, 1 )
+Button/fonts/font = ExtResource( 1 )
+Button/styles/hover = ExtResource( 8 )
+Button/styles/normal = ExtResource( 9 )
+Button/styles/pressed = ExtResource( 6 )
+Label/colors/font_color = Color( 0, 0, 0, 1 )
+Label/fonts/font = ExtResource( 1 )
+Panel/styles/panel = ExtResource( 4 )
+TitleLabel/base_type = "Label"
+TitleLabel/colors/font_color = Color( 1, 1, 1, 1 )
+TitleLabel/fonts/font = ExtResource( 5 )
+TitleLabelDark/base_type = "TitleLabel"
 
 [node name="UiButton" type="Button"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme = ExtResource( 1 )
+theme = SubResource( 1 )
 script = ExtResource( 3 )
 __meta__ = {
 "_edit_group_": true

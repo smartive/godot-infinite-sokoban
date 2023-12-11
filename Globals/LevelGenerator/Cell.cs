@@ -13,6 +13,13 @@ public enum Cell
 
 public static class CellExtensions
 {
+    public static bool IsGoal(this Cell cell) =>
+        cell switch
+        {
+            Cell.Goal or Cell.PlayerOnGoal or Cell.BoxOnGoal => true,
+            _ => false,
+        };
+
     public static bool CouldBlockPlayer(this Cell cell) =>
         cell switch
         {

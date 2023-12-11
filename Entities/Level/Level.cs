@@ -17,7 +17,7 @@ public class Level : Node2D
     private Player.Player _player = null!;
     private Tween _objectMover = null!;
 
-    private readonly List<Coordinates> _levelGoals = [];
+    private List<Coordinates> _levelGoals = [];
     private LevelGenerator _levelGenerator = null!;
     private GeneratedLevel? _generatedLevel;
     private CoordinateArray<Cell?>? _blockingEntities;
@@ -46,75 +46,28 @@ public class Level : Node2D
     [Export(PropertyHint.Range, "1,3,1")]
     public int BoxCount { get; set; } = 2;
 
+    public Vector2 Size => new((Width * 3 + 2) * 64, (Height * 3 + 2) * 64);
+
     private CoordinateArray<Cell?> BlockingEntities => _blockingEntities ?? new CoordinateArray<Cell?>(Width, Height);
     private GeneratedLevel LoadedLevel => _generatedLevel ?? throw new("Level is null.");
 
-    public void Generate()
+    public void Start()
     {
         _generatedLevel = _levelGenerator.GenerateLevel(Height, Width, BoxCount);
-        _blockingEntities = new CoordinateArray<Cell?>(_generatedLevel.Width, _generatedLevel.Height);
-        _levelGoals.Clear();
+        _blockingEntities = new CoordinateArray<Cell?>(LoadedLevel.Width, LoadedLevel.Height);
+        _levelGoals = _generatedLevel.IndexedIterator()
+            .Where(cell => cell.Data.IsGoal())
+            .Select(cell => (cell.X, cell.Y)).ToList();
+        DrawLevel();
+    }
 
-        foreach (var (x, y, cell) in _generatedLevel.IndexedIterator())
-        {
-            var floor = Objects[Cell.Floor].Instance<LevelEntity>();
-            floor.GridPosition = (x, y);
-            _floor.AddChild(floor);
-
-            switch (cell)
-            {
-                case Cell.Wall:
-                    {
-                        var wall = Objects[Cell.Wall].Instance<LevelEntity>();
-                        wall.GridPosition = (x, y);
-                        _walls.AddChild(wall);
-                        _blockingEntities[x, y] = Cell.Wall;
-                    }
-                    break;
-                case Cell.Goal:
-                    {
-                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
-                        goal.GridPosition = (x, y);
-                        _levelGoals.Add((x, y));
-                        _goals.AddChild(goal);
-                    }
-                    break;
-                case Cell.Box:
-                    {
-                        var box = Objects[Cell.Box].Instance<Box>();
-                        box.GridPosition = (x, y);
-                        _boxes.AddChild(box);
-                        _blockingEntities[x, y] = Cell.Box;
-                    }
-                    break;
-                case Cell.Player:
-                    {
-                        _player.GridPosition = (x, y);
-                    }
-                    break;
-                case Cell.BoxOnGoal:
-                    {
-                        var box = Objects[Cell.Box].Instance<Box>();
-                        box.GridPosition = (x, y);
-                        _boxes.AddChild(box);
-                        _blockingEntities[x, y] = Cell.Box;
-
-                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
-                        goal.GridPosition = (x, y);
-                        _goals.AddChild(goal);
-                    }
-                    break;
-
-                case Cell.PlayerOnGoal:
-                    {
-                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
-                        goal.GridPosition = (x, y);
-                        _goals.AddChild(goal);
-                        _player.GridPosition = (x, y);
-                    }
-                    break;
-            }
-        }
+    public void Reset()
+    {
+        _floor.FreeAllChildren();
+        _walls.FreeAllChildren();
+        _goals.FreeAllChildren();
+        _boxes.FreeAllChildren();
+        DrawLevel();
     }
 
     public override void _EnterTree()
@@ -212,6 +165,70 @@ public class Level : Node2D
                 }
 
                 break;
+        }
+    }
+
+    private void DrawLevel()
+    {
+        foreach (var (x, y, cell) in LoadedLevel.IndexedIterator())
+        {
+            var floor = Objects[Cell.Floor].Instance<LevelEntity>();
+            floor.GridPosition = (x, y);
+            _floor.AddChild(floor);
+
+            switch (cell)
+            {
+                case Cell.Wall:
+                    {
+                        var wall = Objects[Cell.Wall].Instance<LevelEntity>();
+                        wall.GridPosition = (x, y);
+                        _walls.AddChild(wall);
+                        BlockingEntities[x, y] = Cell.Wall;
+                    }
+                    break;
+                case Cell.Goal:
+                    {
+                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
+                        goal.GridPosition = (x, y);
+                        _levelGoals.Add((x, y));
+                        _goals.AddChild(goal);
+                    }
+                    break;
+                case Cell.Box:
+                    {
+                        var box = Objects[Cell.Box].Instance<Box>();
+                        box.GridPosition = (x, y);
+                        _boxes.AddChild(box);
+                        BlockingEntities[x, y] = Cell.Box;
+                    }
+                    break;
+                case Cell.Player:
+                    {
+                        _player.GridPosition = (x, y);
+                    }
+                    break;
+                case Cell.BoxOnGoal:
+                    {
+                        var box = Objects[Cell.Box].Instance<Box>();
+                        box.GridPosition = (x, y);
+                        _boxes.AddChild(box);
+                        BlockingEntities[x, y] = Cell.Box;
+
+                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
+                        goal.GridPosition = (x, y);
+                        _goals.AddChild(goal);
+                    }
+                    break;
+
+                case Cell.PlayerOnGoal:
+                    {
+                        var goal = Objects[Cell.Goal].Instance<LevelEntity>();
+                        goal.GridPosition = (x, y);
+                        _goals.AddChild(goal);
+                        _player.GridPosition = (x, y);
+                    }
+                    break;
+            }
         }
     }
 
