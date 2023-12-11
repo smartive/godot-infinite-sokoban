@@ -1,4 +1,5 @@
 using InfiniteSokoban.Data;
+using InfiniteSokoban.Entities.Tile;
 using InfiniteSokoban.Extensions;
 using InfiniteSokoban.Globals;
 using InfiniteSokoban.Globals.LevelGenerator;
@@ -16,9 +17,17 @@ public class Level : Node2D
     private Player.Player _player = null!;
     private Tween _objectMover = null!;
 
+    private readonly List<Coordinates> _levelGoals = [];
     private LevelGenerator _levelGenerator = null!;
     private GeneratedLevel? _generatedLevel;
     private CoordinateArray<Cell?>? _blockingEntities;
+    private int _boxesOnGoal;
+
+    [Signal]
+    public delegate void LevelFinished();
+
+    [Signal]
+    public delegate void LevelProgress(int onGoal, int totalGoals);
 
     private static readonly Dictionary<Cell, PackedScene> Objects = new()
     {
@@ -44,6 +53,7 @@ public class Level : Node2D
     {
         _generatedLevel = _levelGenerator.GenerateLevel(Height, Width, BoxCount);
         _blockingEntities = new CoordinateArray<Cell?>(_generatedLevel.Width, _generatedLevel.Height);
+        _levelGoals.Clear();
 
         foreach (var (x, y, cell) in _generatedLevel.IndexedIterator())
         {
@@ -65,12 +75,13 @@ public class Level : Node2D
                     {
                         var goal = Objects[Cell.Goal].Instance<LevelEntity>();
                         goal.GridPosition = (x, y);
+                        _levelGoals.Add((x, y));
                         _goals.AddChild(goal);
                     }
                     break;
                 case Cell.Box:
                     {
-                        var box = Objects[Cell.Box].Instance<LevelEntity>();
+                        var box = Objects[Cell.Box].Instance<Box>();
                         box.GridPosition = (x, y);
                         _boxes.AddChild(box);
                         _blockingEntities[x, y] = Cell.Box;
@@ -83,7 +94,7 @@ public class Level : Node2D
                     break;
                 case Cell.BoxOnGoal:
                     {
-                        var box = Objects[Cell.Box].Instance<LevelEntity>();
+                        var box = Objects[Cell.Box].Instance<Box>();
                         box.GridPosition = (x, y);
                         _boxes.AddChild(box);
                         _blockingEntities[x, y] = Cell.Box;
@@ -185,12 +196,25 @@ public class Level : Node2D
 
     private void OnObjectMoved(Object obj, NodePath _)
     {
-        if (obj is Player.Player p)
+        switch (obj)
         {
-            p.Stop();
+            case Player.Player p:
+                p.Stop();
+                break;
+            case Box b:
+                b.OnGoal = _levelGoals.Contains(b.GridPosition);
+                _boxesOnGoal += b.OnGoal ? 1 : -1;
+                EmitSignal(nameof(LevelProgress), _boxesOnGoal, _levelGoals.Count);
+
+                if (_boxesOnGoal == _levelGoals.Count)
+                {
+                    EmitSignal(nameof(LevelFinished));
+                }
+
+                break;
         }
     }
 
-    private static Vector2 CoordsToPos((int X, int Y) gridPosition) =>
+    private static Vector2 CoordsToPos(Coordinates gridPosition) =>
         new(gridPosition.X * 64, gridPosition.Y * 64);
 }

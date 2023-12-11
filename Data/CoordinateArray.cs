@@ -3,8 +3,6 @@ using System.Text;
 
 namespace InfiniteSokoban.Data;
 
-using Coordinates = (int X, int Y);
-
 public class CoordinateArray<T> : IEnumerable<T>
 {
     public CoordinateArray(int width, int height)

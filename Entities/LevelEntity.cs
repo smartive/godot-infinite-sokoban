@@ -4,7 +4,7 @@ public class LevelEntity : Node2D
 {
     private const int TileSize = 64;
 
-    public (int X, int Y) GridPosition
+    public Coordinates GridPosition
     {
         get => (X: (int)Position.x / TileSize, Y: (int)Position.y / TileSize);
         set => Position = new Vector2(value.X * TileSize, value.Y * TileSize);
