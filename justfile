@@ -28,7 +28,6 @@ _install-target target:
 export C_INCLUDE_PATH := "$EMSDK/upstream/emscripten/cache/sysroot/include"
 _build-wasm:
     @echo "Build wasm library."
-    echo {{C_INCLUDE_PATH}}
     cd native && cargo +nightly-2023-01-27 build -r --target wasm32-unknown-emscripten
 
 _build-windows: (_install-target "x86_64-pc-windows-msvc")

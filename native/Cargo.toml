@@ -9,10 +9,3 @@ crate-type = ["cdylib"]
 [dependencies]
 gdnative = "0.11.3"
 sokoban-level-generator = { git = "https://github.com/smartive/rust-sokoban-level-generator.git", version = "0.0.0-development" }
-
-[target.wasm32-unknown-emscripten]
-rustflags = [
-    "-Clink-arg=-sSIDE_MODULE=2", # build a side module that Godot can load
-    "-Zlink-native-libraries=no", # workaround for a wasm-ld error during linking
-    "-Cpanic=abort", # workaround for a runtime error related to dyncalls
-]
