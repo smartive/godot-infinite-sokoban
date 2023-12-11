@@ -20,7 +20,8 @@ LevelGenerator="*res://Globals/LevelGenerator/LevelGenerator.tscn"
 
 [display]
 
-window/size/height=1024
+window/size/width=900
+window/size/height=900
 
 [gui]
 

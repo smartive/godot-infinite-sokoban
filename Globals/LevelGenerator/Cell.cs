@@ -14,18 +14,10 @@ public enum Cell
 public static class CellExtensions
 {
     public static bool IsGoal(this Cell cell) =>
-        cell switch
-        {
-            Cell.Goal or Cell.PlayerOnGoal or Cell.BoxOnGoal => true,
-            _ => false,
-        };
+        cell is Cell.Goal or Cell.PlayerOnGoal or Cell.BoxOnGoal;
 
     public static bool CouldBlockPlayer(this Cell cell) =>
-        cell switch
-        {
-            Cell.Wall or Cell.Box or Cell.BoxOnGoal => true,
-            _ => false,
-        };
+        cell is Cell.Wall or Cell.Box or Cell.BoxOnGoal;
 
     public static char ToChar(this Cell cell) =>
         cell switch

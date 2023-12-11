@@ -4,6 +4,8 @@ public class Box : LevelEntity
 {
     private Sprite _onGoal = null!;
 
+    public bool InitialOnGoal { get; set; }
+    
     public bool OnGoal
     {
         get => _onGoal.Visible;
@@ -13,5 +15,6 @@ public class Box : LevelEntity
     public override void _Ready()
     {
         _onGoal = GetNode<Sprite>("%OnGoal");
+        _onGoal.Visible = InitialOnGoal;
     }
 }

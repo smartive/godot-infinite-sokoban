@@ -38,28 +38,29 @@ public class Level : Node2D
     };
 
     [Export(PropertyHint.Range, "1,4,1")]
-    public int Width { get; set; } = 3;
+    public int XRooms { get; set; } = 3;
 
     [Export(PropertyHint.Range, "1,4,1")]
-    public int Height { get; set; } = 2;
+    public int YRooms { get; set; } = 2;
 
     [Export(PropertyHint.Range, "1,3,1")]
     public int BoxCount { get; set; } = 2;
 
-    public Vector2 Size => new((Width * 3 + 2) * 64, (Height * 3 + 2) * 64);
+    public Vector2 Size => new((XRooms * 3 + 2) * 64, (YRooms * 3 + 2) * 64);
 
-    private CoordinateArray<Cell?> BlockingEntities => _blockingEntities ?? new CoordinateArray<Cell?>(Width, Height);
+    private CoordinateArray<Cell?> BlockingEntities => _blockingEntities ?? new CoordinateArray<Cell?>(XRooms, YRooms);
     private GeneratedLevel LoadedLevel => _generatedLevel ?? throw new("Level is null.");
 
-    public void Start()
+    public void Generate()
     {
-        _generatedLevel = _levelGenerator.GenerateLevel(Height, Width, BoxCount);
+        _generatedLevel = _levelGenerator.GenerateLevel(YRooms, XRooms, BoxCount);
         _blockingEntities = new CoordinateArray<Cell?>(LoadedLevel.Width, LoadedLevel.Height);
         _levelGoals = _generatedLevel.IndexedIterator()
             .Where(cell => cell.Data.IsGoal())
             .Select(cell => (cell.X, cell.Y)).ToList();
-        DrawLevel();
     }
+
+    public void Start() => Reset();
 
     public void Reset()
     {
@@ -67,7 +68,9 @@ public class Level : Node2D
         _walls.FreeAllChildren();
         _goals.FreeAllChildren();
         _boxes.FreeAllChildren();
+        _player.Look(Direction.Down);
         DrawLevel();
+        EmitSignal(nameof(LevelProgress), _boxesOnGoal, _levelGoals.Count);
     }
 
     public override void _EnterTree()
@@ -155,9 +158,20 @@ public class Level : Node2D
                 p.Stop();
                 break;
             case Box b:
-                b.OnGoal = _levelGoals.Contains(b.GridPosition);
-                _boxesOnGoal += b.OnGoal ? 1 : -1;
-                EmitSignal(nameof(LevelProgress), _boxesOnGoal, _levelGoals.Count);
+                var isNowOnGoal = _levelGoals.Contains(b.GridPosition);
+                switch (isNowOnGoal)
+                {
+                    case true when !b.OnGoal:
+                        _boxesOnGoal += 1;
+                        EmitSignal(nameof(LevelProgress), _boxesOnGoal, _levelGoals.Count);
+                        break;
+                    case false when b.OnGoal:
+                        _boxesOnGoal -= 1;
+                        EmitSignal(nameof(LevelProgress), _boxesOnGoal, _levelGoals.Count);
+                        break;
+                }
+
+                b.OnGoal = isNowOnGoal;
 
                 if (_boxesOnGoal == _levelGoals.Count)
                 {
@@ -190,7 +204,6 @@ public class Level : Node2D
                     {
                         var goal = Objects[Cell.Goal].Instance<LevelEntity>();
                         goal.GridPosition = (x, y);
-                        _levelGoals.Add((x, y));
                         _goals.AddChild(goal);
                     }
                     break;
@@ -211,8 +224,11 @@ public class Level : Node2D
                     {
                         var box = Objects[Cell.Box].Instance<Box>();
                         box.GridPosition = (x, y);
+                        box.InitialOnGoal = true;
                         _boxes.AddChild(box);
                         BlockingEntities[x, y] = Cell.Box;
+                        _boxesOnGoal += 1;
+                        EmitSignal(nameof(LevelProgress), _boxesOnGoal, _levelGoals.Count);
 
                         var goal = Objects[Cell.Goal].Instance<LevelEntity>();
                         goal.GridPosition = (x, y);
@@ -224,7 +240,6 @@ public class Level : Node2D
                     {
                         var goal = Objects[Cell.Goal].Instance<LevelEntity>();
                         goal.GridPosition = (x, y);
-                        _goals.AddChild(goal);
                         _player.GridPosition = (x, y);
                     }
                     break;

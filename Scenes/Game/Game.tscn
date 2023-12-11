@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Entities/Level/Level.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scenes/Game/Game.cs" type="Script" id=2]
@@ -75,12 +75,17 @@ __meta__ = {
 "_editor_description_": ""
 }
 
-[node name="UiButton" parent="LevelControls" instance=ExtResource( 4 )]
+[node name="Reset" parent="LevelControls" instance=ExtResource( 4 )]
 anchor_left = 0.9
 anchor_right = 0.95
+text = "reset"
 
 [node name="TouchControls" parent="." instance=ExtResource( 5 )]
 visible = false
 
 [node name="Level" parent="." instance=ExtResource( 1 )]
 unique_name_in_owner = true
+
+[connection signal="pressed" from="LevelControls/Reset" to="." method="OnResetPressed"]
+[connection signal="LevelFinished" from="Level" to="." method="OnLevelFinished"]
+[connection signal="LevelProgress" from="Level" to="." method="OnLevelProgress"]
