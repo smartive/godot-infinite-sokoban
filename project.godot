@@ -21,6 +21,8 @@ LevelGenerator="*res://Globals/LevelGenerator/LevelGenerator.tscn"
 [display]
 
 window/size/height=1024
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
 
 [gui]
 
