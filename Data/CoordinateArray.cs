@@ -114,6 +114,8 @@ public class CoordinateArray<T> : IEnumerable<T>
 
     public CoordinateArray<T> Clone() => new(Width, Height, (T[])Data.Clone());
 
+    public void Clear() => Array.Clear(Data, 0, Data.Length);
+
     public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)Data).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -69,6 +69,8 @@ public class Level : Node2D
         _goals.FreeAllChildren();
         _boxes.FreeAllChildren();
         _player.Look(Direction.Down);
+        BlockingEntities.Clear();
+        _boxesOnGoal = 0;
         DrawLevel();
         EmitSignal(nameof(LevelProgress), _boxesOnGoal, _levelGoals.Count);
     }
