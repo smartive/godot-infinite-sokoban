@@ -1,16 +1,17 @@
+using InfiniteSokoban.Globals;
+using InfiniteSokoban.Globals.UiAudio;
+
 namespace InfiniteSokoban.Ui.Button;
 
 public class UiButton : Godot.Button
 {
-    private AudioStreamPlayer _audioStreamPlayer = null!;
-    
-    public override void _Ready()
+    private UiAudio _audio = null!;
+
+    public override void _EnterTree()
     {
-        _audioStreamPlayer = GetNode<AudioStreamPlayer>("%Sfx");
+        base._EnterTree();
+        _audio = GetNode<UiAudio>(AutoLoadIdentifier.UiAudio);
     }
-    
-    private void OnPressed()
-    {
-        _audioStreamPlayer.Play();
-    }
+
+    private void OnPressed() => _audio.ButtonClick();
 }

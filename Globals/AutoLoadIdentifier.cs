@@ -2,5 +2,5 @@ namespace InfiniteSokoban.Globals;
 
 public static class AutoLoadIdentifier
 {
-    // public const string LevelGenerator = "/root/LevelGenerator";
+    public const string UiAudio = "/root/UiAudio";
 }

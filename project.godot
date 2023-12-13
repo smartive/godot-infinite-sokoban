@@ -14,6 +14,10 @@ config/name="Infinite-sokoban"
 run/main_scene="res://Scenes/Main.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+UiAudio="*res://Globals/UiAudio/UiAudio.tscn"
+
 [display]
 
 window/size/height=1024

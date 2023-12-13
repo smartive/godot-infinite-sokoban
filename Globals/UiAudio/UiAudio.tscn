@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Globals/UiAudio/UiAudio.cs" type="Script" id=1]
+[ext_resource path="res://Assets/Audio/button_click.ogg" type="AudioStream" id=2]
+
+[node name="UiAudio" type="Node"]
+script = ExtResource( 1 )
+
+[node name="ButtonClick" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource( 2 )
+bus = "SFX"

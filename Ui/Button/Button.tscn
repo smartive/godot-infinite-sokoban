@@ -1,7 +1,6 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Ui/Fonts/Default.tres" type="DynamicFont" id=1]
-[ext_resource path="res://Assets/Audio/button_click.ogg" type="AudioStream" id=2]
 [ext_resource path="res://Ui/Button/UiButton.cs" type="Script" id=3]
 [ext_resource path="res://Ui/Panel/GrayPanel.tres" type="StyleBox" id=4]
 [ext_resource path="res://Ui/Fonts/Title.tres" type="DynamicFont" id=5]
@@ -34,10 +33,5 @@ script = ExtResource( 3 )
 __meta__ = {
 "_edit_group_": true
 }
-
-[node name="Sfx" type="AudioStreamPlayer" parent="."]
-unique_name_in_owner = true
-stream = ExtResource( 2 )
-bus = "SFX"
 
 [connection signal="pressed" from="." to="." method="OnPressed"]
