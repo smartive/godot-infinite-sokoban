@@ -5,6 +5,15 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: build
+  cancel-in-progress: true
+
 jobs:
   godot-builder:
     name: Build Godot Builder Dockerfile
@@ -72,7 +81,6 @@ jobs:
         working-directory: ./build
 
       - uses: actions/upload-pages-artifact@v1
-        if: always()
         with:
           path: build
 
