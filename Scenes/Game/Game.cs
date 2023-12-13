@@ -20,7 +20,7 @@ public class Game : Node
         _goalInfo.Text = "0/0 Goals";
         _levelInfo.Text = $"Width: {_level.XRooms} Height: {_level.YRooms} Boxes: {_level.BoxCount}";
 
-        _level.Position = OS.WindowSize / 2 - _level.Size / 2;
+        _level.Position = GetViewport().Size / 2 - _level.Size / 2;
 
         _level.Start();
     }
