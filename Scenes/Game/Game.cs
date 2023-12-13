@@ -29,6 +29,11 @@ public class Game : Node
     {
         _level.Reset();
     }
+    
+    private void OnBackPressed()
+    {
+        OnLevelFinished();
+    }
 
     private void OnLevelProgress(int onGoal, int totalGoals)
     {

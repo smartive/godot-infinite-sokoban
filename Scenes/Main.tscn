@@ -41,7 +41,6 @@ margin_left = -81.92
 margin_top = -30.72
 margin_right = 81.92
 margin_bottom = 30.72
-theme = null
 text = "Start Game"
 __meta__ = {
 "_editor_description_": ""
