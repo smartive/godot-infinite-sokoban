@@ -67,6 +67,7 @@ jobs:
             sed "s/index/index.${TS}/g" index.$TS.html > index.html
 
       - uses: actions/upload-pages-artifact@v1
+        if: always()
         with:
           path: build
 
