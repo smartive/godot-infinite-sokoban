@@ -2,7 +2,7 @@ using System.Text;
 
 using InfiniteSokoban.Data;
 
-namespace InfiniteSokoban.Globals.LevelGenerator;
+namespace InfiniteSokoban.LevelGenerator;
 
 using BacktrackState = (Coordinates[] Boxes, Coordinates PlayerPosition, CoordinateArray<Cell> Level, int Step);
 

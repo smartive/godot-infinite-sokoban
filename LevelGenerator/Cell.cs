@@ -1,4 +1,4 @@
-namespace InfiniteSokoban.Globals.LevelGenerator;
+namespace InfiniteSokoban.LevelGenerator;
 
 public enum Cell
 {

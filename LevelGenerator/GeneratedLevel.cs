@@ -2,7 +2,7 @@ using System.Text;
 
 using InfiniteSokoban.Data;
 
-namespace InfiniteSokoban.Globals.LevelGenerator;
+namespace InfiniteSokoban.LevelGenerator;
 
 public class GeneratedLevel(int width, int height) : CoordinateArray<Cell>(width, height, Cell.Wall)
 {

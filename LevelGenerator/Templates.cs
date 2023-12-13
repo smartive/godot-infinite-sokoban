@@ -1,6 +1,6 @@
 using InfiniteSokoban.Data;
 
-namespace InfiniteSokoban.Globals.LevelGenerator;
+namespace InfiniteSokoban.LevelGenerator;
 
 public static class Templates
 {

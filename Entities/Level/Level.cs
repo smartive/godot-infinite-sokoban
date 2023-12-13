@@ -1,8 +1,7 @@
 using InfiniteSokoban.Data;
 using InfiniteSokoban.Entities.Tile;
 using InfiniteSokoban.Extensions;
-using InfiniteSokoban.Globals;
-using InfiniteSokoban.Globals.LevelGenerator;
+using InfiniteSokoban.LevelGenerator;
 
 using Object = Godot.Object;
 
@@ -52,7 +51,7 @@ public class Level : Node2D
 
     public void Generate()
     {
-        _generatedLevel = LevelGenerator.GenerateLevel(XRooms, YRooms, BoxCount);
+        _generatedLevel = LevelGenerator.LevelGenerator.GenerateLevel(XRooms, YRooms, BoxCount);
         _blockingEntities = new CoordinateArray<Cell?>(LoadedLevel.Width, LoadedLevel.Height);
         _levelGoals = _generatedLevel.IndexedIterator()
             .Where(cell => cell.Data.IsGoal())
