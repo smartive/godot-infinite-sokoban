@@ -59,10 +59,12 @@ jobs:
             mkdir -p build
             godot -v --export "HTML5" build/index.html
 
+      - name: Change permissions
+        run: sudo chown -R $(whoami) build
+
       - name: Cache Busting
         run: |
           TS=$(date +%s)
-          cd build
           for f in index.*; do
             mv $f ${f/./.$TS.}
           done
