@@ -4,8 +4,8 @@ ARG COMMIT_SHA=unknown
 
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
 
-ENV GODOT_VERSION=${GODOT_VERSION}
 ENV DOTNET_VERSION=${DOTNET_VERSION}
+ENV GODOT_VERSION=${GODOT_VERSION}
 
 LABEL org.opencontainers.image.authors="christoph@smartive.ch" \
     org.opencontainers.image.url="https://github.com/smartive/godot-infinite-sokoban" \

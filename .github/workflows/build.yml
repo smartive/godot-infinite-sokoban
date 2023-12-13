@@ -39,6 +39,8 @@ jobs:
           push: true
           file: godot-build.dockerfile
           tags: ghcr.io/smartive/godot-dotnet-builder:8.0-3.5.3
+          build-args: |
+            COMMIT_SHA=${{ github.sha }}
 
   build-html:
     name: Build HTML5
