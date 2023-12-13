@@ -58,13 +58,16 @@ jobs:
             cd /game
             mkdir -p build
             godot -v --export "HTML5" build/index.html
-            echo "Cache Busting"
-            TS=$(date +%s)
-            cd build
-            for f in index.*; do
-              mv $f ${f/./.$TS.}
-            done
-            sed "s/index/index.${TS}/g" index.$TS.html > index.html
+
+      - name: Cache Busting
+        run: |
+          TS=$(date +%s)
+          cd build
+          for f in index.*; do
+            mv $f ${f/./.$TS.}
+          done
+          sed "s/index/index.${TS}/g" index.$TS.html > index.html
+        working-directory: ./build
 
       - uses: actions/upload-pages-artifact@v1
         if: always()
