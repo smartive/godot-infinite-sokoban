@@ -18,7 +18,6 @@ public class Level : Node2D
     private Tween _objectMover = null!;
 
     private List<Coordinates> _levelGoals = [];
-    private LevelGenerator _levelGenerator = null!;
     private GeneratedLevel? _generatedLevel;
     private CoordinateArray<Cell?>? _blockingEntities;
     private int _boxesOnGoal;
@@ -53,7 +52,7 @@ public class Level : Node2D
 
     public void Generate()
     {
-        _generatedLevel = _levelGenerator.GenerateLevel(YRooms, XRooms, BoxCount);
+        _generatedLevel = LevelGenerator.GenerateLevel(XRooms, YRooms, BoxCount);
         _blockingEntities = new CoordinateArray<Cell?>(LoadedLevel.Width, LoadedLevel.Height);
         _levelGoals = _generatedLevel.IndexedIterator()
             .Where(cell => cell.Data.IsGoal())
@@ -73,11 +72,6 @@ public class Level : Node2D
         _boxesOnGoal = 0;
         DrawLevel();
         EmitSignal(nameof(LevelProgress), _boxesOnGoal, _levelGoals.Count);
-    }
-
-    public override void _EnterTree()
-    {
-        _levelGenerator = GetNode<LevelGenerator>(AutoLoadIdentifier.LevelGenerator);
     }
 
     public override void _Ready()

@@ -1,3 +1,6 @@
+global using Coordinates = (int X, int Y);
+global using Dimensions = (int Width, int Height);
+
 using System.Collections;
 using System.Text;
 
@@ -12,16 +15,41 @@ public class CoordinateArray<T> : IEnumerable<T>
         Data = new T[width * height];
     }
 
-    private CoordinateArray(int width, int height, T[] data)
+    public CoordinateArray(Dimensions dimensions)
+        : this(dimensions.Width, dimensions.Height)
+    {
+    }
+
+    public CoordinateArray(int width, int height, Func<Coordinates, T> initializer)
+        : this(width, height)
+    {
+        foreach (var (x, y) in IndexIterator())
+        {
+            this[x, y] = initializer((x, y));
+        }
+    }
+
+    public CoordinateArray(int width, int height, T initialValue)
+        : this(width, height, _ => initialValue)
+    {
+    }
+
+    public CoordinateArray(int width, int height, T[] data)
     {
         Width = width;
         Height = height;
         Data = data;
     }
 
+    public CoordinateArray(T[,] data)
+        : this(data.GetLength(1), data.GetLength(0)) =>
+        Data = data.Cast<T>().ToArray();
+
     public int Width { get; }
 
     public int Height { get; }
+
+    public Dimensions Dimensions => (Width, Height);
 
     private T[] Data { get; }
 
@@ -70,6 +98,35 @@ public class CoordinateArray<T> : IEnumerable<T>
 
         return window;
     }
+
+    public IEnumerable<CoordinateArray<T>> Windows(int windowWidth, int windowHeight)
+    {
+        // Adjust the window size to ensure there is at least one window
+        windowWidth = Math.Min(windowWidth, Width);
+        windowHeight = Math.Min(windowHeight, Height);
+
+        for (var x = 0; x < Width - windowWidth; x++)
+        {
+            for (var y = 0; y < Height - windowHeight; y++)
+            {
+                yield return GetWindow((x, y), (x + windowWidth - 1, y + windowHeight - 1));
+            }
+        }
+    }
+
+    public void ApplyWindow(CoordinateArray<T> window, Coordinates at)
+    {
+        for (var x = 0; x < window.Width; x++)
+        {
+            for (var y = 0; y < window.Height; y++)
+            {
+                this[x + at.X, y + at.Y] = window[x, y];
+            }
+        }
+    }
+
+    public bool IsInBounds(Coordinates index) =>
+        index.X >= 0 && index.X < Width && index.Y >= 0 && index.Y < Height;
 
     public T[] GetRow(int index)
     {
